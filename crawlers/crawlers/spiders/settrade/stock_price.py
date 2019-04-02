@@ -10,7 +10,7 @@ class SETTradeStockPriceSpider(scrapy.Spider):
     name = 'settrade_stock_price'
 
     # MongoDB
-    collection_name = 'stock_price'
+    collection_name = 'stock_prices'
     unique_indexes = [('symbol', 1), ('date', 1)]
 
     def __init__(self, symbols=None, *args, **kwargs):
