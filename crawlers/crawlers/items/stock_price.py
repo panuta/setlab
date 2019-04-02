@@ -2,6 +2,7 @@ import scrapy
 
 
 class StockPrice(scrapy.Item):
+    symbol = scrapy.Field()
     date = scrapy.Field()
     price_open = scrapy.Field()
     price_high = scrapy.Field()
