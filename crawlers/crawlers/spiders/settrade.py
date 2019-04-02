@@ -2,14 +2,27 @@
 import scrapy
 from dateutil.parser import parse
 
-class KaohoonSpider(scrapy.Spider):
-    name = 'kaohoon'
-    start_urls = ['https://www.kaohoon.com/content/tag/foreign-investors']
+
+class SETTradeSpider(scrapy.Spider):
+    name = 'settrade'
+
+    def __init__(self, symbols=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if symbols:
+            self.symbol_list = symbols.split(',')
+        else:
+            self.symbol_list = []
 
     def start_requests(self):
-        yield scrapy.Request('https://www.kaohoon.com/content/tag/foreign-investors', self.parse_list)
+        for symbol in self.symbol_list:
+            request_url = 'https://www.settrade.com/C04_02_stock_historical_p1.jsp?txtSymbol={}&selectPage=2'.format(
+                symbol)
+            yield scrapy.Request(request_url, self.parse)
 
-    def parse_list(self, response):
+    def parse(self, response):
+
+
         for article_id in response.xpath('//article/@id').getall():
             article_id = article_id.split('-')[1]
             yield scrapy.Request(response.urljoin('/content/{article_id}'.format(
