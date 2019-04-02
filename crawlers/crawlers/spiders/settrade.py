@@ -21,22 +21,24 @@ class SETTradeSpider(scrapy.Spider):
             yield scrapy.Request(request_url, self.parse)
 
     def parse(self, response):
+        price_table = response.xpath('//div[@id="maincontent"]/descendant::table')[0]
 
+        """
+        วันที่
+        ราคาเปิด
+        ราคาสูงสุด
+        ราคาต่ำสุด
+        ราคาเฉลี่ย
+        ราคาปิด
+        เปลี่ยนแปลง
+        %เปลี่ยนแปลง
+        ปริมาณ (พันหุ้น)
+        มูลค่า (ล้านบาท)
+        SET Index
+        %เปลี่ยนแปลง
+        """
 
-        for article_id in response.xpath('//article/@id').getall():
-            article_id = article_id.split('-')[1]
-            yield scrapy.Request(response.urljoin('/content/{article_id}'.format(
-                article_id=article_id)), self.parse_article)
-            break
+        for table_row in price_table.xpath('.//tbody/tr'):
+            table_row.xpath('.//td').getall()
 
-    def parse_article(self, response):
-        excerpt = response.xpath('//p[@class="entry-excerpt"]/text()').getall()[0]
-        _, _, date_text = excerpt.rpartition('on')
-        article_date = parse(date_text)
-
-        tables = response.xpath('//article/descendant::table')
-        symbols_for_top_purchased_by_value = self._symbols_from_table(tables[2])
-        symbols_for_top_sold_by_value = self._symbols_from_table(tables[3])
-
-    def _symbols_from_table(self, table):
-        return [table_row.xpath('.//td/text()').getall() for table_row in table.xpath('.//tr')[1:]]
+            # StockPrice
