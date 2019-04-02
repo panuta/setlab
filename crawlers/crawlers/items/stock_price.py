@@ -13,3 +13,6 @@ class StockPrice(scrapy.Item):
     price_change_percentage = scrapy.Field()
     trade_volume = scrapy.Field()
     trade_value = scrapy.Field()
+
+    # MongoDB
+    UNIQUE_KEYS = ['symbol', 'date']

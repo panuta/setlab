@@ -8,8 +8,15 @@ from crawlers.items.stock_price import StockPrice
 
 class SETTradeSpider(scrapy.Spider):
     name = 'settrade'
-    collection_name = 'stock_price'
 
+    # MongoDB
+    collection_name = 'stock_price'
+    unique_indexes = [('symbol', 1), ('date', 1)]
+
+    # TODO => How to query by date range
+
+    # db.getCollection('stock_price').createIndex({"symbol": 1, "date": 1}, {unique: true})
+    #
     def __init__(self, symbols=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -47,7 +54,7 @@ class SETTradeSpider(scrapy.Spider):
 
             yield StockPrice(
                 symbol=response.meta['symbol'],
-                date=datetime.strptime(values[0], '%d/%m/%y').date(),
+                date=datetime.strptime(values[0], '%d/%m/%y'),
                 price_open=Decimal(values[1]),
                 price_high=Decimal(values[2]),
                 price_low=Decimal(values[3]),

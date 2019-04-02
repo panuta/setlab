@@ -19,23 +19,32 @@ class MongoDBPipeline(object):
         )
 
     def open_spider(self, spider):
-        collection_name = getattr(spider, 'collection_name')
+        collection_name = getattr(spider, 'collection_name', None)
         if collection_name:
             self.collection_name = collection_name
 
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
+        unique_indexes = getattr(spider, 'unique_indexes', None)
+        if unique_indexes:
+            self.db[self.collection_name].create_index(unique_indexes, unique=True)
+
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
-        # TODO => Have settings or function in spider to activate update_or_create behavior
-
         item_dict = dict(item)
         for key, value in item_dict.items():
             if isinstance(value, Decimal):
                 item_dict[key] = Decimal128(value)
 
-        self.db[self.collection_name].insert_one(item_dict)
+        unique_keys = getattr(item, 'UNIQUE_KEYS', None)
+
+        if not unique_keys:
+            self.db[self.collection_name].insert_one(item_dict)
+        else:
+            query = {key: item_dict[key] for key in unique_keys}
+            self.db[self.collection_name].update_one(query, {'$set': item_dict}, upsert=True)
+
         return item
