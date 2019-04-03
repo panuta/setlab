@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from datetime import datetime
-from decimal import Decimal
 
 from crawlers.items.stock_price import StockPrice
+from crawlers.utils import str_to_numeric
 
 
 class SETTradeStockPriceSpider(scrapy.Spider):
@@ -47,13 +47,13 @@ class SETTradeStockPriceSpider(scrapy.Spider):
             yield StockPrice(
                 symbol=response.meta['symbol'],
                 date=datetime.strptime(values[0], '%d/%m/%y'),
-                price_open=Decimal(values[1]),
-                price_high=Decimal(values[2]),
-                price_low=Decimal(values[3]),
-                price_avg=Decimal(values[4]),
-                price_close=Decimal(values[5]),
-                price_change=Decimal(values[6]),
-                price_change_percentage=Decimal(values[7]),
-                trade_volume=Decimal(values[8].replace(',', '')),
-                trade_value=Decimal(values[9].replace(',', '')),
+                price_open=str_to_numeric(values[1]),
+                price_high=str_to_numeric(values[2]),
+                price_low=str_to_numeric(values[3]),
+                price_avg=str_to_numeric(values[4]),
+                price_close=str_to_numeric(values[5]),
+                price_change=str_to_numeric(values[6]),
+                price_change_percentage=str_to_numeric(values[7]),
+                trade_volume=str_to_numeric(values[8]),
+                trade_value=str_to_numeric(values[9]),
             )

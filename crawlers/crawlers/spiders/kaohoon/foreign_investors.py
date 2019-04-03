@@ -3,13 +3,18 @@ import scrapy
 from dateutil.parser import parse
 
 from crawlers.items.indicator import Indicator
+from crawlers.utils import str_to_numeric
 
 
 class KaohoonForeignInvestorsSpider(scrapy.Spider):
     name = 'kaohoon_foreign_investors'
     indicator_name = 'kaohoon_foreign_investors'
 
-    PAGES = 10  # 10 articles per page
+    PAGES = 2  # Each page has 10 articles
+
+    # MongoDB
+    collection_name = 'kaohoon_foreign'
+    unique_indexes = [('symbol', 1), ('date', 1)]
 
     def start_requests(self):
         for page in range(1, self.PAGES + 1):
@@ -47,6 +52,11 @@ class KaohoonForeignInvestorsSpider(scrapy.Spider):
                 symbol=symbol,
                 indicator_name=self.indicator_name,
                 indicator_type=indicator_type,
-                values='|'.join([buy, sell, total, net])
+                values={
+                    'buy': str_to_numeric(buy),
+                    'sell': str_to_numeric(sell),
+                    'total': str_to_numeric(total),
+                    'net': str_to_numeric(net)
+                }
             ))
         return indicators

@@ -10,4 +10,4 @@ class Indicator(scrapy.Item):
     values = scrapy.Field()
 
     # MongoDB
-    UNIQUE_KEYS = ['symbol', 'date', 'indicator_name']
+    UNIQUE_KEYS = ['symbol', 'date', 'indicator_name', 'indicator_type']
